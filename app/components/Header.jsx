@@ -1,27 +1,31 @@
 "use client";
 import React from "react";
-import { motion, useMotionValue, useScroll } from "framer-motion";
+import { useScroll, motion, useMotionValue } from "framer-motion";
 
 export default function Header() {
   let { scrollY } = useScroll();
   let height = useMotionValue(80);
 
   React.useEffect(() => {
-    return scrollY.onChange((current) => {
+    return scrollY.on("change", (current) => {
       let previous = scrollY.getPrevious();
       let diff = current - previous;
+      const scrollingDown = diff > 0;
       let newHeight = height.get() - diff;
 
-      height.set(Math.min(Math.max(newHeight, 50), 80));
+      scrollingDown
+        ? height.set(Math.max(newHeight, 50))
+        : height.set(Math.min(newHeight, 80));
     });
-  }, [height, scrollY]);
+  }, [scrollY, height]);
+  console.log(scrollY);
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 overflow-hidden text-slate-600">
-      <div className="z-0 flex-1 overflow-y-scroll">
+    <div className="mx-auto flex w-full max-w-3xl flex-1 overflow-hidden bg-white text-slate-600">
+      <div className="z-0 flex-1">
         <motion.header
-          style={{ height }}
           className="fixed inset-x-0 flex h-20 bg-white shadow"
+          style={{ height }}
         >
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-8">
             <p className="flex origin-left items-center text-xl font-semibold uppercase">
